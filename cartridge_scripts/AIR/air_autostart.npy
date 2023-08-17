@@ -1,0 +1,208 @@
+import air
+
+const EASING_FACTOR = 0.2       # 0.0 .. 1.0
+
+const UNIT_CO2 = 0
+const UNIT_NOx = 1
+const UNIT_VOC = 2
+const UNIT_T = 3
+const UNIT_H = 4
+
+setPrecision(1)
+
+def drawArrow(x,y,arrowNr:byte):
+    r = 5
+    push()
+    noStroke()
+    fill(200,200,200)
+    translate(x,y)
+    if arrowNr == 0: # up
+        drawTriangle(-r,r,r,r,0,-r)
+    elif arrowNr == 1: # down
+        drawTriangle(-r,-r,r,-r,0,r)
+    elif arrowNr == 2: # left
+        drawTriangle(-r,0,r,-r,r,r)
+    elif arrowNr == 3: # right
+        drawTriangle(-r,-r,-r,r,r,0)
+    pop()
+
+def ease(old_value:float, new_value:float) -> float:
+    return EASING_FACTOR*new_value + (1.0-EASING_FACTOR)*old_value
+
+class Scala:
+    height:int
+    dy:int
+    scaleElement:int
+    scaleSize:int
+    min:float
+    max:float
+    lastValue:float
+    unit:byte
+    sensorValue:float
+
+    def init(unit_:byte):
+        unit = unit_
+        if unit == UNIT_CO2:
+            min = 0
+            max = 10000
+            height=max
+            scaleElement=50
+            sensorValue = AIR.CO2()
+        elif unit == UNIT_VOC:
+            min = 0
+            max = 500
+            height=1000
+            scaleElement=100
+            sensorValue = AIR.VOCIndex()
+        elif unit == UNIT_NOx:
+            min = 0
+            max = 500
+            height=1000
+            scaleElement=100
+            sensorValue = AIR.NOxIndex()
+        elif unit == UNIT_T:
+            min = -20
+            max = 100
+            height=1000
+            scaleElement=100
+            sensorValue = AIR.temperature()
+        elif unit == UNIT_H:
+            min = 0
+            max = 100
+            height=1000
+            scaleElement=100
+            sensorValue = AIR.humidity()
+        dy=-(height/2)+120
+        lastValue = height/2
+        scaleSize = height/scaleElement
+
+    def drawScale():
+        for j in scaleSize+1:
+            l = j*scaleElement
+            i=0
+            stroke(255,255,255)
+            while i<scaleElement:
+                if i%10 == 0:
+                    drawLine(15,l+dy+i,20,l+dy+i)
+                i++
+            drawLine(10,l+dy,20,l+dy)
+
+    def draw():
+        clear()
+        textFont(FONT_ROBOTO_24 )
+        push()
+        translate(200,0)
+        drawScale()
+        pop()
+        stroke(200,200,200)
+        for j in scaleSize+1:
+            l = j*scaleElement
+            title = "" + toInt(map(l,height,0,min,max))
+            w = textWidth(title)
+            drawText(180-w/2,l-8+dy,title)
+        push()
+        translate(2,120)
+        fill(255,0,0)
+        drawLine(0,0,240,0)
+        pop()
+        stroke(250,250,250)
+        title = ""
+        if unit == UNIT_T:
+            title = "" + AIR.temperature()
+        elif unit == UNIT_H:
+            title = "" + AIR.humidity()
+        else:
+            title = "" + toInt(map(lastValue,height,0,min,max))
+        textFont(FONT_ROBOTO_48)
+        w = textWidth(title)
+        drawText(5,60,title)
+        w=w+5
+        textFont(FONT_ROBOTO_32)
+        stroke(150,150,150)
+        if unit == UNIT_CO2:
+            textFont(FONT_ROBOTO_16)
+            drawText(w,90,"ppm")
+            textFont(FONT_ROBOTO_32)
+            drawText(5,125,"CO")
+            textFont(FONT_ROBOTO_16)
+            drawText(48,142,"2")
+        elif unit == UNIT_VOC:
+            textFont(FONT_ROBOTO_16)
+            drawText(w,90," / 500")
+            textFont(FONT_ROBOTO_32)
+            drawText(5,125,"VOC")
+        elif unit == UNIT_NOx:
+            textFont(FONT_ROBOTO_16)
+            drawText(w,90," / 500")
+            textFont(FONT_ROBOTO_32)
+            drawText(5,125,"NOx")
+        elif unit == UNIT_T:
+            textFont(FONT_ROBOTO_32)
+            drawText(w,65,"°C")
+            textFont(FONT_ROBOTO_32)
+            drawText(5,125,"Temp")
+        elif unit == UNIT_H:
+            textFont(FONT_ROBOTO_32)
+            drawText(w,65,"%")
+            textFont(FONT_ROBOTO_32)
+            drawText(5,125,"Humidity")
+
+    def setValue(v:float):
+        newValue = map(v,min,max,height,0)
+        dy = -newValue+120
+        lastValue = newValue
+
+    def refresh():
+        if unit == UNIT_CO2:
+            sensorValue = ease(sensorValue,AIR.CO2())
+        elif unit == UNIT_VOC:
+            sensorValue = ease(sensorValue,AIR.VOCIndex())
+        elif unit == UNIT_NOx:
+            sensorValue = ease(sensorValue,AIR.NOxIndex())
+        elif unit == UNIT_T:
+            sensorValue = ease(sensorValue,AIR.temperature())
+        elif unit == UNIT_H:
+            sensorValue = ease(sensorValue,AIR.humidity())
+        setValue(sensorValue)
+        draw()
+
+scala:Scala
+
+def drawTitle(text:byte[],x:int,y:int):
+    textFont(FONT_ROBOTO_BOLD_16)
+    w = textWidth(text)
+    fill(150,150,150)
+    noStroke()
+    drawRectangle(x-w/2-10,y-5,w+20,30)
+    stroke(255,255,255)
+    drawText(x-w/2,y,text)
+
+def onDraw():
+    background(30,30,30)
+    scala.refresh()
+    push()
+    drawArrow(10,220,2)
+    drawArrow(30,220,3)
+    drawArrow(100,220,1)
+    textFont(FONT_ROBOTO_16)
+    drawText(50,210,"EXIT")
+    pop()
+    update()
+    pop()
+    if getButton()==4:
+        if returnToMenu():
+            return
+
+index = UNIT_H
+scala.init(UNIT_CO2)
+
+def onClick():
+    b = getButtons()
+    if b.left:
+        index--
+        if index <  0: index = 4
+    if b.right:
+        index++
+        if index > 4: index = 0
+    scala.init(index)
+    delay(500)

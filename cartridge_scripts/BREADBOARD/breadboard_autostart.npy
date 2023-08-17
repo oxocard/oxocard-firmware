@@ -1,0 +1,153 @@
+#
+# gxf lib:
+
+def drawArrow(x,y,arrowNr:byte):
+    r = 5
+    push()
+    noStroke()
+    fill(200,200,200)
+    translate(x,y)
+    if arrowNr == 0: # up
+        drawTriangle(-r,r,r,r,0,-r)
+    elif arrowNr == 1: # down
+        drawTriangle(-r,-r,r,-r,0,r)
+    elif arrowNr == 2: # left
+        drawTriangle(-r,0,r,-r,r,r)
+    elif arrowNr == 3: # right
+        drawTriangle(-r,-r,-r,r,r,0)
+    pop()
+
+def drawRoundedRectangle(x,y,w,h,r):
+    push()
+    translate(x,y)
+    beginShape()
+    addVertex(0,r)
+    addBezierVertex(0, 0)
+    addVertex(r,0)
+    translate(w,0)
+    addVertex(-r,0)
+    addBezierVertex(0, 0)
+    addVertex(0,r)
+    translate(0,h)
+    addVertex(0,-r)
+    addBezierVertex(0, 0)
+    addVertex(-r,0)
+    translate(-w,0)
+    addVertex(r,0)
+    addBezierVertex(0, 0)
+    addVertex(0,-r)
+    endShape(true)
+    pop()
+
+# ------------
+
+def drawHeader():
+    clear()
+    stroke(21,155,228)
+    textFont(FONT_ROBOTO_BOLD_32)
+    drawText(15,10,"BREADBOARD")
+    stroke(255,255,255)
+    textFont(FONT_ROBOTO_32)
+    drawText(20,45,"LIGHTS TEST")
+
+def drawWaitButton(text:byte[]):
+    textFont(FONT_ROBOTO_24)
+    width = textWidth(text)
+    drawRoundedRectangle((220-width)/2,160,width+20,50,8)
+    drawText((240-width)/2,170,text)
+    update()
+
+def drawTestName(text:byte[]):
+    textFont(FONT_ROBOTO_24)
+    width = textWidth(text)
+    drawText((240-width)/2,100,text)
+
+def clearScreenAndWait():
+    clear()
+    update()
+    delay(500)
+
+pins = [C_PIN_01,C_PIN_02,C_PIN_03,C_PIN_04,C_PIN_05]
+
+def setToOutput():
+    initGPIO(C_PIN_01, OUTPUT)
+    initGPIO(C_PIN_02, OUTPUT)
+    initGPIO(C_PIN_03, OUTPUT)
+    initGPIO(C_PIN_04, OUTPUT)
+    initGPIO(C_PIN_05, OUTPUT)
+
+def fading_lights():
+    drawHeader()
+    drawTestName("Fading lights")
+    drawWaitButton("PRESS FOR NEXT")
+    setToOutput()
+    while getButton() == 0:
+        for i in [0..20]:
+            f = i * 200
+            for p in pins
+                writePWM(p, f)
+            delay(20)
+            if getButton() != 0:
+                delay(500)
+                return
+        for i in [20..0]:
+            f = i * 200
+            for p in pins
+                writePWM(p, f)
+            delay(20)
+            if getButton() != 0:
+                delay(500)
+                return
+    clearScreenAndWait()
+
+def random_lights():
+    drawHeader()
+    drawTestName("Random lights")
+    drawWaitButton("PRESS FOR NEXT")
+    setToOutput()
+    while getButton() == 0:
+        writeGPIO(pins[random(0,5)], random(0,1+1))
+        delay(10)
+    clearScreenAndWait()
+
+def running_light():
+    drawHeader()
+    drawTestName("Running lights")
+    drawWaitButton("PRESS FOR NEXT")
+    setToOutput()
+    d = 1
+    i = 0
+    while getButton() == 0:
+        for j in sizeof(pins):
+            writeGPIO(pins[j], j == i)
+        if (d == -1 and i == 0) or (d == 1 and i == 4):
+            d = d * -1
+        i+=d
+        delay(100)
+    clearScreenAndWait()
+
+def drawIntro()->bool:
+    drawHeader()
+    push()
+    drawArrow(215,145,3)
+    textFont(FONT_ROBOTO_16)
+    drawText(170,135,"EXIT")
+    pop()
+    drawWaitButton("PRESS TO START")
+    while getButton() == 0:
+        delay(50)
+    b = getButtons()
+    if b.middle:
+        clearScreenAndWait()
+        return false
+    return true
+
+def onDraw():
+
+    if drawIntro():
+        if returnToMenu():
+            return
+
+    fading_lights()
+    random_lights()
+    running_light()

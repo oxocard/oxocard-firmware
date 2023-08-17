@@ -1,0 +1,56 @@
+# LIBRARY   : air.npy
+# Object    : AIR
+# Functions : AIR.CO2()
+#             AIR.NOx()
+#             AIR.NOxIndex()
+#             AIR.VOC()
+#             AIR.VOCIndex()
+#             AIR.temperature()
+#             AIR.humidity()
+#             AIR.humidityAbsolute()
+#             AIR.IAQ()
+
+class AIRClass: # internal class name
+    _initialized:bool
+
+    def init():
+        # nothing to do
+        _initialized = true
+
+    def CO2()->float:
+        if not _initialized: init()
+        return getCO2()
+
+    def NOx()->float:
+        if not _initialized: init()
+        return getNOx()
+
+    def NOxIndex()->int:
+        if not _initialized: init()
+        return getNOxIndex()
+
+    def VOC()->int:
+        if not _initialized: init()
+        return getVOC()
+
+    def VOCIndex()->int:
+        if not _initialized: init()
+        return getVOCIndex()
+
+    def temperature()->float:
+        if not _initialized: init()
+        return getTemperature()
+
+    def humidity()->float:
+        if not _initialized: init()
+        return getHumidity()
+
+    def humidityAbsolute()->float:
+        if not _initialized: init()
+        return getHumidityAbsolute()
+
+    def IAQ()->float:
+        if not _initialized: init()
+        return getIAQ()
+
+AIR:AIRClass  # global exposed object

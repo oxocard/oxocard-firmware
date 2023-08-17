@@ -1,0 +1,48 @@
+# LIBRARY   : tof.npy
+# Object    : TOF
+# Functions : TOF.init()
+#             TOF.set4x4()
+#             TOF.set8x8()
+#             TOF.getData()
+# Members   : TOF.data[64]
+#             TOF.status[64]
+
+class TOFCompactClass: # internal class name
+    _initialized:bool
+    _4x4:bool
+    data:int[64]
+    status:int[64]
+
+    def init():
+        # only init if we don't get a dataReady
+        if not vl53l5cxWaitForDataReady(): # takes up to 1s
+            vl53l5cxInit() # takes up to 10s
+        vl53l5cxConfigure(true, 15, true) # 8x8 & 15Hz (max)
+        _4x4 = false
+        vl53l5cxStart()
+        _initialized = true
+
+    def set4x4():
+        if _initialized:
+            vl53l5cxStop()
+            vl53l5cxConfigure(false, 60, true) # 4x4 & 60Hz (max)
+            _4x4 = true
+            vl53l5cxStart()
+
+    def set8x8():
+        if _initialized:
+            vl53l5cxStop()
+            vl53l5cxConfigure(true, 15, true) # 8x8 & 15Hz (max)
+            _4x4 = false
+            vl53l5cxStart()
+
+    def getData():
+        if _initialized and vl53l5cxWaitForDataReady():
+            vl53l5cxReadData()
+            maxDataCount = 64
+            if _4x4: maxDataCount = 16
+            for i in maxDataCount:
+                data[i] = vl53l5cxGetData(i)
+                status[i] = vl53l5cxGetTargetStatus(i)
+
+TOF:TOFCompactClass  # global exposed object

@@ -1,0 +1,49 @@
+import tof
+
+const COLOR = 81    # HUE
+const THRESHOLD = 1000 # 200..1500
+const h = 2.2       # 0.1 .. 10.0
+
+cnt = 8
+
+textFont(FONT_ROBOTO_24)
+w = textWidth("init TOF ~10s")
+drawText(120-w/2,10,"init TOF ~10s")
+update()
+TOF.init()  # inits and calibrates the TOF (takes up to 10s)
+
+translateCamera3D(0, -4.5, 0.8*h)
+rotateCameraX(-0.4)
+rotateCameraZ(PI/2)
+
+def onDraw():
+    TOF.getData()  # reads the 64 (8x8) sensor data and status values
+    #TOF.data[i]   # data indicating the distance in mm
+    #TOF.status[i] # status indicating the measurement validity (5 & 9 means ranging OK)
+    push()
+    translate3D(-0.5*cnt, -0.5*cnt, 0)
+    clear()
+    noStroke()
+    i = 0
+    w = 240/cnt
+    for x in cnt:
+        for y in cnt:
+            v = TOF.data[i]
+            t = TOF.status[i]
+            znorm:float
+            znorm = map(v,0,THRESHOLD,0.0,-5.0)
+            if ((t == 5 or t == 9) and v < THRESHOLD):
+                fillHSV(COLOR,255,map(v,0,THRESHOLD,255,60))
+            else:
+                fill(20,20,20)
+                znorm = -5.0
+            push()
+            translate3D(cnt-x, y,znorm)
+            drawCube(1.0)
+            pop()
+            i++
+    pop()
+    update()
+    if getButton():
+        if returnToMenu():
+            return

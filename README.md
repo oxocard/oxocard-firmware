@@ -1,5 +1,5 @@
-# NanoPy
-Repository for the NanoPy programming language including cartridge scripts and oxocard binaries.
+# oxocard-firmware
+Repository for the Oxocard Firmware including Cartridge scripts and Oxocard binaries.
 
 ## How to re-flash my Oxocard?
 1. Make sure python and pip are installed

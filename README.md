@@ -8,12 +8,18 @@ Repository for the Oxocard Firmware including Cartridge scripts and Oxocard bina
 4. Replace (PORT) and run: `esptool.py -p (PORT) erase_flash`
 5. Navigate into the ".../oxocard_binaries/" directory
 6. In the following command: Make sure the paths to the binary files you want to flash are correct, replace (PORT) and run: `esptool.py -p (PORT) -b 921600 --before default_reset --after hard_reset --chip esp32  write_flash --flash_mode qio --flash_size detect --flash_freq 80m 0x1000 common/bootloader.bin 0x8000 common/partition-table.bin 0x10000 connect/oxocard_mini_connect_v142.bin`
-7. On the very first startup, the HW test must be completed
+7. On the very first startup, the HW test may have to be completed
 
 Example of flashing an Oxocard Science using macOS:
 ```
 esptool.py -p /dev/cu.wchusbserial1440 erase_flash
 esptool.py -p /dev/cu.wchusbserial1440 -b 921600 --before default_reset --after hard_reset --chip esp32 write_flash --flash_mode qio --flash_size detect --flash_freq 80m 0x1000 common/bootloader.bin 0x8000 common/partition-table.bin 0x10000 science/oxocard_mini_science_v142.bin
+```
+
+Example of flashing an Oxocard Blockly using macOS:
+```
+esptool.py -p /dev/cu.wchusbserial1440 erase_flash
+esptool.py -p /dev/cu.wchusbserial1440 -b 921600 --before default_reset --after hard_reset --chip esp32  write_flash --flash_mode qio --flash_size detect --flash_freq 80m 0x1000 blockly/bootloader.bin 0x8000 blockly/partition-table.bin 0x10000 blockly/oxocard_blockly_v219.bin
 ```
 
 ## How to program a Cartridge?

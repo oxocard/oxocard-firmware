@@ -14,7 +14,6 @@ def main():
 
     products = []
     Path("webpage/firmware").mkdir(parents=True, exist_ok=True)
-    Path("webpage/manifest").mkdir(parents=True, exist_ok=True)
 
     for card in cards:
         firmware = sorted(list((firmware_path / card).glob("*.bin")), reverse=True)[0]
@@ -37,7 +36,7 @@ def main():
 
         template = env.get_template("manifest.json")
         with open(
-            Path("webpage") / "manifest" / firmware.with_suffix(".json").name, "w"
+            Path("webpage") / f"manifest_{firmware.with_suffix('.json').name}", "w"
         ) as f:
             f.write(
                 template.render(

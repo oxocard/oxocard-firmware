@@ -13,6 +13,8 @@ def main():
     )
 
     products = []
+    Path("webpage/firmware").mkdir(parents=True, exist_ok=True)
+    Path("webpage/manifest").mkdir(parents=True, exist_ok=True)
 
     for card in cards:
         firmware = sorted(list((firmware_path / card).glob("*.bin")), reverse=True)[0]

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "oxocard-firmware-web-installer"
+version = "0.1.0"
+description = ""
+authors = ["Jacques Supcik <jacques@supcik.net>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{ include = "build.py" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Jinja2 = "^3.1.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+build = "build:main"

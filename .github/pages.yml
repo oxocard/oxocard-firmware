@@ -1,0 +1,46 @@
+name: Deploy to Pages
+
+on:
+  push:
+    branches: [$default-branch]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: install poetry
+        run: pip install poetry
+      - name: install esptool
+        run: pip install esptool
+      - name: install builder
+        run: poetry install
+      - name: build
+        run: poetry run build
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: "webpage"
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

@@ -1,0 +1,13 @@
+{
+  "name": "{{ name}}",
+  "version": "{{ version }}",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        { "path": "{{ path }}", "offset": 0 }
+      ]
+    }
+  ]
+}

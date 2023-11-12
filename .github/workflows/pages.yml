@@ -2,7 +2,6 @@ name: Deploy to Pages
 
 on:
   push:
-    branches: [$default-branch]
   workflow_dispatch:
 
 permissions:
@@ -11,7 +10,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
@@ -40,7 +39,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: "webpage"
+          path: 'webpage'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2

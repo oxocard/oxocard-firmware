@@ -1,0 +1,13 @@
+{
+  "name": "{{ name}}",
+  "version": "{{ version }}",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        { "path": "firmware/merged/{{ file_name }}", "offset": 0 }
+      ]
+    }
+  ]
+}

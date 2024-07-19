@@ -1,0 +1,82 @@
+import pixelmatrix5x5
+
+const BRIGHTNESS        = 0.4       # 0.0 .. 1.0
+const ANIMATION_DELAY   = 500       # 50 .. 1000   
+const SHOW_DIGIT        = true      # true .. false
+const NUMBER_OF_LEDS    = 25
+
+
+######################################### Color Wheel Function ##############################################
+def colorWheel(pos:byte)->color:
+    col:color
+    if(pos < 85):
+        col.r = pos * 3
+        col.g = 255 - pos * 3
+        col.b = 0
+    else if(pos < 170):
+        pos -= 85;
+        col.r = 255 - pos * 3
+        col.g = 0
+        col.b = pos * 3
+    else:
+        pos -= 170;
+        col.r = 0
+        col.g = pos * 3
+        col.b = 255 - pos * 3
+    return col
+
+
+############################################# Main program ##################################################
+
+clear()
+textFont(FONT_ROBOTO_32)
+stroke(21,155,228)
+drawTextCentered(120,90,"PIXELMATRIX")
+stroke(255,255,255)
+drawTextCentered(120,130,"CARTRIDGE")
+update()
+
+# Variables
+counter:byte
+matrixColor:color
+
+# Init Pixel Matrix
+PixelMatrix5x5:PixelMatrix5x5Class
+PixelMatrix5x5.init()
+
+def onDraw():   
+    
+    # Calculate matrix color and set it 
+    PixelMatrix5x5.setBrightness(BRIGHTNESS)
+    for ledNumber in NUMBER_OF_LEDS:
+        matrixColor = colorWheel(ledNumber+counter*2)
+        PixelMatrix5x5.drawPixel(ledNumber/5, ledNumber%5, matrixColor.r, matrixColor.g, matrixColor.b)
+
+    # Draw digit, if enabled
+    if SHOW_DIGIT: 
+        # Fade in and out digit
+        brightnessDigit = 0.1
+        for b in 20: 
+            # Send color to leds
+            PixelMatrix5x5.setBrightness(brightnessDigit)
+            PixelMatrix5x5.drawDigit(9-counter%10,100 ,100 ,50)
+            PixelMatrix5x5.update()
+
+            if b < 10: 
+                brightnessDigit += 0.1
+            else
+                brightnessDigit -= 0.1
+
+            delay(ANIMATION_DELAY/20)
+    else
+        # Update matrix
+        PixelMatrix5x5.update()
+        delay(ANIMATION_DELAY)
+    
+    counter++
+  
+    # Return to Menu if any button pressed
+	if getButton():
+		if returnToMenu():
+			return
+

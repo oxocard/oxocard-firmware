@@ -1,0 +1,72 @@
+# TODO# *** Library: pixelmatrix5x5.npy
+
+MATRIX5X5_DIGITS = [
+    0b111, 0b101, 0b101, 0b101, 0b111, # 0
+    0b010, 0b110, 0b010, 0b010, 0b010, # 1
+    0b111, 0b001, 0b111, 0b100, 0b111, # 2
+    0b111, 0b001, 0b111, 0b001, 0b111, # 3
+    0b101, 0b101, 0b111, 0b001, 0b001, # 4
+    0b111, 0b100, 0b111, 0b001, 0b111, # 5
+    0b111, 0b100, 0b111, 0b101, 0b111, # 6
+    0b111, 0b001, 0b010, 0b100, 0b100, # 7
+    0b111, 0b101, 0b111, 0b101, 0b111, # 8
+    0b111, 0b101, 0b111, 0b001, 0b111  # 9
+]
+
+# MAP
+#       0  1  2  3  4
+#       -------------
+#  0 |  4  3  2  1  0 E
+#  1 |  5  6  7  8  9 O
+#  2 | 14 13 12 11 10 E
+#  3 | 15 16 17 18 19 O
+#  4 | 24 23 22 21 20 E
+
+class PixelMatrix5x5Class:
+    _initialized:bool
+    _matrix_brightness:float
+    def init():
+        _initialized = true
+        _matrix_brightness = 1.0
+        initDigitalLeds(C_PIN_01, 25, C_LED_TYPE_WS2812);
+
+    def drawPixel(x:int,y:int,r:byte,g:byte,b:byte):
+        if not _initialized: init()
+        if x < 0 or x > 4 or y < 0 or y > 4 return
+        idx = x+(y*5)
+        if y % 2 == 0: # even?
+            idx = (4-x)+(y*5)
+        setDigitalLed(idx,_matrix_brightness*r,_matrix_brightness*g,_matrix_brightness*b)
+
+    def drawRectangle(x,y,w,h,r,g,b):
+        if not _initialized: init()
+        for i in w+1:
+            drawPixel(x+i,y,r,g,b)
+            drawPixel(x+i,y+h,r,g,b)
+        for i in h+1:
+            drawPixel(x,y+i,r,g,b)
+            drawPixel(x+w,y+i,r,g,b)
+
+    def drawDigit(digit:byte,r:byte,g:byte,b:byte):
+        if not _initialized: init()
+        for y in 5:
+            d = MATRIX5X5_DIGITS[y+(digit*5)]
+            for x in 5:
+                if d & (8>>x):
+                    drawPixel(x,y,r,g,b)
+
+    def setBrightness(brightness:float)
+        if not _initialized: init()
+        _matrix_brightness = brightness
+
+    def clear():
+        if not _initialized: init()
+        for i in 25:
+            setDigitalLed(i,0,0,0)
+
+    def update():
+        if not _initialized: init()
+        applyDigitalLeds()
+
+
+# *** END Library: pixelmatrix5x5.npy

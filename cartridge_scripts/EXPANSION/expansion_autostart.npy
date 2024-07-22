@@ -1,0 +1,533 @@
+const VISIBLE_WINDOW       = 5          # 3 .. 15
+const POWERMODE_TICKS      = 60         # 30 .. 100
+const MAX_ENEMIES          = 20        # 10 .. 30
+const LIFES                = 3          # 1..8
+const DELAY                = 0          # 0..50
+
+const MAP_SIZE              =   19      # need to be the same size as in the map images
+const MAKEY_VELOCITY        =   0.25
+const ENEMY_VELOCITY        =   0.125
+const DIAMOND               =   170     # Color code of the diamond sprite   
+const ENEMY                 =   160     # color code of the enemy sprite
+const MAKEY_VELOCITY_STEPS = 1.0 / MAKEY_VELOCITY
+const ENEMY_VELOCITY_STEPS = 1.0 / ENEMY_VELOCITY
+const GRIT_SIZE = 240 / VISIBLE_WINDOW
+const SCALE24_24 = 10.0 / VISIBLE_WINDOW
+const SCALE12_12 = 20.0 / VISIBLE_WINDOW
+
+const MAX_LEVEL             =   3 
+
+# image
+level0Map:byte[19*19] = [
+1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+170,0,160,0,0,1,170,0,160,0,160,0,0,1,0,160,0,0,0,
+1,0,1,0,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,
+1,0,1,0,0,1,0,0,0,1,0,0,0,1,0,170,1,0,1,
+1,0,0,0,0,0,0,1,0,0,170,1,0,0,0,0,0,0,1,
+1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1,
+1,0,0,0,0,1,0,0,0,0,0,170,0,1,0,160,0,0,1,
+1,0,1,1,0,1,160,1,1,170,1,1,160,1,0,1,1,1,1,
+1,0,160,0,0,1,0,1,1,0,1,1,0,1,0,0,0,0,1,
+1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,1,1,0,1,
+1,0,0,1,0,0,0,160,0,0,0,160,0,170,0,1,0,170,1,
+1,0,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,
+1,0,0,0,170,0,0,0,0,1,0,0,0,0,0,160,0,0,1,
+1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,
+0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,
+1,0,1,1,0,1,160,0,1,1,1,0,0,1,0,1,1,1,1,
+1,0,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,0,1,
+1,0,0,0,0,170,0,0,0,0,0,170,0,160,0,0,0,0,1,
+1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+]
+
+# image
+level1Map:byte[19*19] = [
+1,1,0,1,1,1,1,170,1,1,1,1,1,1,0,170,1,1,1,
+1,1,0,0,0,0,160,0,0,0,0,0,160,0,0,0,0,160,1,
+1,0,0,1,0,0,1,1,1,0,0,0,0,1,1,1,1,0,1,
+1,0,0,1,0,170,0,0,0,0,0,170,0,0,0,0,1,0,0,
+1,0,160,0,0,0,0,0,1,0,1,1,0,1,0,0,1,0,1,
+0,0,0,1,0,1,0,0,1,160,0,1,0,1,0,0,0,160,170,
+170,1,0,1,0,1,0,0,1,0,170,1,0,1,0,0,1,0,1,
+1,1,160,0,0,1,0,0,1,1,0,1,0,0,0,170,1,0,1,
+1,1,0,1,170,0,0,160,0,0,0,0,0,1,0,0,0,0,1,
+0,0,0,1,0,1,0,1,0,0,0,1,0,1,0,0,1,160,1,
+0,1,0,0,0,1,0,160,0,0,0,0,0,1,160,0,1,0,1,
+1,1,0,1,0,1,0,1,0,0,0,1,0,0,0,0,0,0,1,
+1,0,0,1,0,0,0,1,1,0,170,0,0,1,0,0,1,0,0,
+0,0,160,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,
+1,1,0,1,0,1,0,1,1,1,0,1,1,1,0,170,1,160,1,
+1,1,0,1,170,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,160,0,1,0,1,1,1,0,1,1,1,1,0,1,1,1,0,170,
+1,0,0,0,0,0,0,160,0,0,0,0,160,0,0,0,160,0,1,
+1,1,1,0,1,1,1,1,170,1,1,1,1,1,0,1,1,1,1
+]
+
+# image
+level2Map:byte[19*19] = [
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,
+0,0,0,0,1,1,0,1,1,0,1,0,1,1,1,0,0,0,0,
+0,0,0,0,1,1,160,0,0,0,0,0,160,0,1,0,0,0,0,
+0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,
+0,0,0,0,1,1,0,170,1,1,1,170,0,1,1,0,0,0,0,
+0,0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,0,0,
+0,0,0,0,1,1,0,0,1,0,1,0,0,1,1,0,0,0,0,
+0,0,0,0,1,0,0,170,0,0,0,170,0,0,1,0,0,0,0,
+0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,
+0,0,0,0,1,160,0,0,0,160,0,0,160,0,1,0,0,0,0,
+0,0,0,0,1,1,1,0,1,170,1,0,1,1,1,0,0,0,0,
+0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+]
+
+# image
+diamondImage:byte[19*19] = [
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,14,41,42,12,42,42,42,42,42,42,42,12,0,0,0,0,
+0,0,14,89,200,200,200,200,137,103,119,103,103,119,119,12,0,0,0,
+0,14,89,200,200,137,137,135,71,40,72,56,40,56,104,73,41,0,0,
+14,89,135,135,200,137,121,71,56,40,39,72,56,72,88,136,73,42,0,
+89,184,136,119,135,121,71,40,40,40,40,40,72,88,136,136,136,73,39,
+200,135,135,135,137,89,55,55,71,39,40,40,56,104,55,42,42,57,119,
+200,200,200,137,200,200,135,135,135,168,136,136,136,119,103,119,121,135,200,
+121,137,121,121,200,168,136,136,136,136,136,168,119,121,200,200,120,119,73,
+13,121,137,121,137,137,136,136,136,136,136,168,137,103,72,120,119,57,0,
+0,13,121,137,121,200,135,136,136,136,136,119,137,104,120,119,57,0,0,
+0,0,13,121,137,105,121,136,136,136,136,137,120,88,119,57,0,0,0,
+0,0,0,13,105,121,121,135,136,136,135,121,19,119,57,0,0,0,0,
+0,0,0,0,13,105,137,200,136,136,135,19,87,38,0,0,0,0,0,
+0,0,0,0,0,13,105,200,136,168,103,103,57,0,0,0,0,0,0,
+0,0,0,0,0,0,13,103,136,168,137,38,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,13,103,119,57,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,13,41,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+]
+
+# image
+makeyImage:byte[19*19] = [
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,160,160,160,160,160,0,0,0,0,0,0,0,
+0,0,0,0,0,0,160,160,160,160,160,160,160,0,0,0,0,0,0,
+0,0,0,0,0,160,160,160,160,160,160,160,160,160,0,0,0,0,0,
+0,0,0,0,160,160,15,15,160,160,160,15,15,160,160,0,0,0,0,
+0,0,0,0,160,160,15,15,160,160,160,15,15,160,160,0,0,0,0,
+0,0,0,0,160,160,160,160,160,160,160,160,160,160,160,0,0,0,0,
+0,0,0,0,0,0,15,15,15,15,15,15,15,0,0,0,0,0,0,
+0,0,0,0,160,160,160,160,160,160,160,160,160,160,160,0,0,0,0,
+0,160,0,160,160,160,160,15,15,15,15,15,160,160,160,160,0,160,0,
+160,160,15,160,160,160,15,160,15,15,15,160,15,160,160,160,15,160,160,
+160,160,15,160,160,15,15,160,160,15,160,160,15,15,160,160,15,160,160,
+160,160,15,15,15,15,15,160,160,160,160,160,15,15,15,15,15,160,160,
+160,160,15,160,160,15,15,160,15,160,15,160,15,15,160,160,15,160,160,
+0,160,0,160,160,160,15,160,15,160,15,160,15,160,160,160,15,160,0,
+160,160,0,160,160,160,15,15,15,15,15,15,160,160,160,160,0,160,160,
+160,160,0,0,160,160,160,160,160,160,160,160,160,160,160,0,0,160,160,
+160,160,0,0,0,160,160,160,0,0,0,160,160,160,0,0,0,160,160,
+0,160,160,0,0,160,160,160,0,0,0,160,160,160,0,0,160,160,0
+]
+
+# image
+enemyImage:byte[19*19] = [
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,163,163,163,163,163,163,163,0,0,0,0,0,0,
+0,0,0,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,0,
+0,0,0,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,0,
+0,0,0,163,163,1,1,1,1,1,1,1,1,1,163,163,0,0,0,
+0,0,0,163,163,1,1,1,1,1,1,1,1,1,163,163,0,0,0,
+0,0,0,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,0,
+0,0,0,0,163,163,163,163,163,163,163,163,163,163,163,0,0,0,0,
+0,0,0,0,0,163,163,163,163,163,163,163,163,163,0,0,0,0,0,
+0,0,0,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,0,
+0,0,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,
+0,0,163,163,1,1,1,1,1,1,1,1,1,1,1,163,163,0,0,
+0,0,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,
+0,0,163,163,1,1,1,1,1,1,1,1,1,1,1,163,163,0,0,
+0,0,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,
+0,0,163,163,1,1,1,1,1,1,1,1,1,1,1,163,163,0,0,
+0,0,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,
+0,0,0,163,163,1,1,1,1,1,1,1,1,1,163,163,0,0,0,
+0,0,0,0,163,163,163,163,163,163,163,163,163,163,163,0,0,0,0
+]
+
+# image
+brickImage:byte[12*12] = [
+0,0,7,7,7,3,3,3,3,3,0,0,
+0,7,3,4,4,4,3,4,4,3,3,0,
+7,3,4,4,4,4,3,4,4,4,3,3,
+3,4,4,4,4,3,4,4,4,4,4,3,
+3,4,4,4,4,3,4,4,4,4,4,3,
+3,4,4,4,3,4,4,4,4,4,4,3,
+0,3,3,3,3,3,3,3,3,3,3,0,
+3,3,4,4,4,4,4,3,4,4,3,3,
+3,4,4,4,4,4,3,4,4,4,4,3,
+3,3,4,4,4,4,3,4,4,4,3,3,
+0,3,3,4,4,3,4,4,4,3,3,0,
+0,0,3,3,3,3,3,3,3,3,0,0
+]
+
+gameMap:byte[19*19]
+
+def getRandomDirection()->vector:
+    direction:vector
+    rnd = random(0,4)
+    if rnd==0: direction.y=-1
+    elif rnd==1: direction.y=1
+    elif rnd==2: direction.x=-1
+    elif rnd==3: direction.x=1
+    return direction
+
+def isWall(x:float,y:float)->bool:
+    if x < 0 or y < 0 or x > MAP_SIZE-1 or y > MAP_SIZE-1:
+        return 1 # edges are walls too
+    mapValue = gameMap[x+(y*MAP_SIZE)]
+    return mapValue == 1
+
+def eatDiamond(x:int,y:int)->bool:
+    mapValue = gameMap[x+(y*MAP_SIZE)]
+    result = mapValue == DIAMOND
+    if result:
+        gameMap[x+(y*MAP_SIZE)] = 0
+    return result
+
+# ---- CLASS PLAYER --------------------
+class Player:
+    pos:vector
+    vel:vector
+    powerTicks:int
+    def init(x,y):
+        pos(x=x,y=y)
+        vel(x=0,y=0)
+        powerTickes=0
+
+    def setPowerMode():
+        powerTicks = POWERMODE_TICKS
+    def draw(offset:vector):
+        push()
+        translate(offset.x*GRIT_SIZE,offset.y*GRIT_SIZE)
+        translate(24,24)
+        scale(SCALE24_24)
+        
+        if powerTicks > 0:
+            for i in 3:
+                stroke(51,171,random(210,250))
+                drawCircle(0,0,random(14,18))
+            powerTicks--
+        drawSprite(0,0, 19,19 , makeyImage)
+        pop()
+        
+    def isPowerMode()->bool:
+        return powerTicks > 0
+
+# ---- ENEMY PLAYER --------------------
+class Enemy:
+    pos:vector
+    vel:vector
+    steps:int
+    alive:bool
+    def init():
+        steps = 0
+        alive = false
+        vel = vector(x=1,y=0)
+    def step():
+        if not alive: return
+        if steps == 0:
+            tmp = getRandomDirection()    
+            while isWall(pos.x+tmp.x,pos.y+tmp.y):
+                tmp = getRandomDirection()
+            vel = tmp
+            vel.mulScalar(ENEMY_VELOCITY)
+            steps = ENEMY_VELOCITY_STEPS        
+        else:
+            pos.add(vel)
+            steps--             
+    
+    def draw(screenOffset:vector):
+        if not alive: return
+        push()
+        translate((pos.x-screenOffset.x)*GRIT_SIZE,(pos.y-screenOffset.y)*GRIT_SIZE)
+        translate(24,24)
+        scale(SCALE24_24)
+        drawSprite(0,0, 19,19 , enemyImage)
+        pop()
+
+    def hitTest(playerPos:vector)->bool:
+        if not alive: return false
+        return ceil(pos.x) == ceil(playerPos.x) and ceil(pos.y) == ceil(playerPos.y) 
+    
+    def destroy(): 
+        alive = false
+
+# ---- CLASS GAME --------------------
+class Game:
+    player:Player
+    lifes:int
+    enemies:Enemy[MAX_ENEMIES]
+    playerOffset:vector
+    screenOffset:vector
+    player_stepper:int
+    score:int
+    diamonds:int
+    currentLevel:int
+    exitRaised:bool
+
+    def init(restartGame:bool):
+        player.init(9,9)
+        centerOffset = ((MAP_SIZE)-(VISIBLE_WINDOW))/2
+        screenOffset = vector(x=centerOffset,y=centerOffset)
+        playerOffset = vector(x=VISIBLE_WINDOW/2,y=VISIBLE_WINDOW/2)
+
+        if restartGame: currentLevel = 0
+        if currentLevel == 0: gameMap = level0Map
+
+        j=0
+        for i in sizeof(enemies):
+            enemies[i].init()
+            found = false
+            while not found and j < sizeof(gameMap):
+                if gameMap[j] == ENEMY:
+                    enemies[i].pos = vector(x=j%MAP_SIZE,y=j/MAP_SIZE)
+                    enemies[i].alive=true
+                    found = true
+                j++
+
+        for m in gameMap:
+            if m ==DIAMOND:
+                diamonds++
+            
+        player_stepper = 0
+        if restartGame:
+            lifes = LIFES
+            score = 0
+        exitRaised = false
+
+    def intro():
+
+        init(true)
+
+        clear()
+        stroke(255, 255, 255)
+        textFont(FONT_ROBOTO_BOLD_32)
+        textAlignment(TEXT_ALIGN_CENTER)
+        drawText(120,100,"MAKEY")
+        textFont(FONT_ROBOTO_16)
+        textAlignment(TEXT_ALIGN_LEFT)
+        push()
+      
+        translate(50,210)
+        fill(0,0,0)
+        drawCircle(0,0,14)
+        stroke(255,255,255)
+        strokeWeight(2)
+        drawLine(-4,0,0,3)
+        drawLine(4,0,0,3)
+        drawText(20,-10,"EXIT")
+        pop()
+        push()
+        translate(130,210)
+        fill(0,0,0)
+        drawCircle(0,0,14)
+        stroke(255,255,255)
+        drawCircle(0,0,9)
+        fill(255,255,255)
+        drawCircle(0,0,3)
+        drawText(20,-10,"START")
+        pop()
+        update()
+        delay(200)
+        b = getButtons()
+        while not (b.middle or b.down):
+            delay(100)
+            b = getButtons()
+
+        if b.down: exitRaised = true        
+
+
+        
+    def gameEnds(gameOver:bool):
+        clear()
+        stroke(255, 255, 255)
+        textFont(FONT_ROBOTO_BOLD_32)
+        textAlignment(TEXT_ALIGN_CENTER)
+        if gameOver:
+            drawText(120,100,"GAME OVER")
+        else:
+            drawText(120,100,"YOU WIN!")
+        drawText(120,140,"SCORE: " + score)
+        update()
+        delay(3000)
+        intro()
+    
+
+    def nextLevel():
+        if currentLevel < MAX_LEVEL-1:
+            currentLevel++
+
+            if currentLevel == 1:
+                gameMap = level1Map
+            elif currentLevel == 2:
+                gameMap = level2Map
+
+            clear()
+            stroke(255, 255, 255)
+            textFont(FONT_ROBOTO_BOLD_32)
+            textAlignment(TEXT_ALIGN_CENTER)
+            drawText(120,100,"NEXT LEVEL")
+            update()
+            delay(2000)
+            init(false)
+        else:
+            currentLevel=0
+            gameEnds(false)
+            
+        
+    def movePlayer():
+        if player_stepper > 0:
+            if player.vel.y != 0.0:
+                player.pos.y+=player.vel.y
+                if player.vel.y < 0.0:
+                    if playerOffset.y > 3.0:
+                        playerOffset.y+=player.vel.y 
+                    else:
+                        if screenOffset.y > 0.0:
+                            screenOffset.y+=player.vel.y
+                        else:
+                            playerOffset.y+=player.vel.y
+                else:
+                    if playerOffset.y >=1.0 and screenOffset.y < (MAP_SIZE - VISIBLE_WINDOW):
+                        screenOffset.y+=player.vel.y
+                    else:
+                        playerOffset.y+=player.vel.y 
+            else if player.vel.x != 0.0:
+                player.pos.x+=player.vel.x
+                if player.vel.x < 0.0:
+                    if playerOffset.x > 3.0:
+                        playerOffset.x+=player.vel.x 
+                    else:
+                        if screenOffset.x > 0.0:
+                            screenOffset.x+=player.vel.x
+                        else:
+                            playerOffset.x+=player.vel.x
+                else:
+                    if playerOffset.x >=1.0 and screenOffset.x < (MAP_SIZE - VISIBLE_WINDOW):
+                        screenOffset.x+=player.vel.x
+                    else:
+                        playerOffset.x+=player.vel.x
+            player_stepper--
+       
+    def step():
+        
+        if eatDiamond(player.pos.x,player.pos.y):
+            player.setPowerMode()
+            diamonds--
+
+        stillEnemies=false
+        for i in sizeof(enemies):
+            if enemies[i].alive: stillEnemies = true
+            if enemies[i].hitTest(player.pos):
+                background(255,255,255)
+                update()
+                if player.isPowerMode():
+                    enemies[i].destroy()
+                    score+=100
+                else:
+                    enemies[i].destroy()
+                    lifes--
+                    if lifes==0: 
+                        gameEnds(true)        
+                        return
+
+        if stillEnemies and diamonds==0 and not player.isPowerMode():
+            gameEnds(true)
+            return
+
+        if not stillEnemies:
+            nextLevel()
+            return
+        
+        if player_stepper > 0: return
+        button = getButtons()
+        player_stepper = MAKEY_VELOCITY_STEPS
+        player.vel.x = 0.0
+        player.vel.y = 0.0
+        if button.up and player.pos.y >0 and not isWall(player.pos.x,player.pos.y-1.0):
+            player.vel.y = -MAKEY_VELOCITY
+        else if button.down and player.pos.y < MAP_SIZE-1 and not isWall(player.pos.x,player.pos.y+1.0):
+            player.vel.y = MAKEY_VELOCITY
+        else if button.left and player.pos.x > 0 and not isWall(player.pos.x-1.0,player.pos.y):
+            player.vel.x = -MAKEY_VELOCITY
+        else if button.right and player.pos.x < MAP_SIZE-1 and not isWall(player.pos.x+1.0,player.pos.y):
+            player.vel.x = MAKEY_VELOCITY
+        else:
+            player_stepper = 0
+
+    def drawMap():
+        for x in VISIBLE_WINDOW+1:
+            for y in VISIBLE_WINDOW+1:
+                xd = screenOffset.x - floor(screenOffset.x)
+                yd = screenOffset.y - floor(screenOffset.y)
+                mapValue = gameMap[toInt(floor(screenOffset.x))+x+((toInt(floor(screenOffset.y))+y)*MAP_SIZE)]
+                if mapValue ==1 or mapValue == 170:
+                    push()
+                    translate(x*GRIT_SIZE,y*GRIT_SIZE)
+                    translate(-xd*GRIT_SIZE,-yd*GRIT_SIZE)
+                    translate(24,24)              
+                    if mapValue == 1:      
+                        scale(SCALE12_12)
+                        drawSprite(0,0,12,12,brickImage)
+                    else:
+                        scale(SCALE24_24 * 0.5)
+                        drawSprite(0,0,19,19,diamondImage)
+                    pop()
+        pop() 
+
+    def drawStatusInfos():
+        for i in lifes:
+            drawSprite(20+(i*24),10,19,19,makeyImage)
+
+        if player.isPowerMode():
+            noStroke()
+            fill(51,171,random(210,250))
+            drawRectangle(10,25,map(player.powerTicks,0,POWERMODE_TICKS,0,110),10)
+            noFill()
+            stroke(51,171,random(210,250))
+            drawRectangle(10,25,110,10)
+
+        stroke(240,240,240)
+        textAlignment(TEXT_ALIGN_RIGHT)
+        textFont(FONT_ROBOTO_BOLD_16)
+        drawText(230,5,"SCORE: " + score)
+        
+    def moveEnemies():
+        for i in sizeof(enemies):
+            if enemies[i].alive: 
+                enemies[i].draw(screenOffset)    
+                enemies[i].step()
+
+    def draw():
+        drawMap()
+        movePlayer()
+        moveEnemies()
+        player.draw(playerOffset)
+        drawStatusInfos()
+
+game:Game
+game.intro()
+
+def onDraw():
+
+    if game.exitRaised: 
+        if returnToMenu(): return
+        else: game.exitRaised = false
+
+    background(10,10,10)
+    game.step()
+    game.draw()
+
+    update()
+    delay(DELAY)

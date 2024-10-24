@@ -1,11 +1,11 @@
 import cartridge_header
 
-const CARTRIDGE_ID              = 0x00000050 # EXPANSION
-const CARTRIDGE_HW_VERSION      = 0x00000001
-const CARTRIDGE_FW_VERSION      = 0x00000002
-CARTRIDGE_NAME:byte[30]         = "EXPANSION"
+const CARTRIDGE_ID              = 0x00000070 # SYNTHESIZER
+const CARTRIDGE_HW_VERSION      = 0x00000002
+const CARTRIDGE_FW_VERSION      = 0x00000003
+CARTRIDGE_NAME:byte[30]         = "SYNTHESIZER"
 
-AUTOSTART_FILE:byte[40]         = "expansion_autostart.npy"
+AUTOSTART_FILE:byte[40]         = "synthesizer_autostart.npy"
 IMPORT_FILE:byte[40]            = ""
 DEMO_01_FILE:byte[40]           = ""
 
@@ -19,7 +19,7 @@ ch.init()
 def onDraw():
     clear()
     textFont(FONT_ROBOTO_32)
-    stroke(227,137,20)
+    stroke(21,155,228)
     drawText(10,10,CARTRIDGE_NAME)
     stroke(255,255,255)
     drawText(10,50,"FLASHER")

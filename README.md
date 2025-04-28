@@ -29,3 +29,15 @@ esptool.py -p /dev/cu.wchusbserial1440 -b 921600 --before default_reset --after 
 4. Load those scripts onto your Oxocard Connect using the "Load on card" function within "My Scripts"
 5. Copy the "\<cartridge_name>_flasher.npy" file into the NanoPy editor and flash it on the Oxocard Connect using "Run code" 
 6. Connect the cartridge with your Oxocard Connect (if you haven't yet) and click a button to write the data to the EERPOM on the cartridge
+
+
+## Alernative flasher
+
+Instead of using the original esptool from espressif, there are several free tools, that runs in the browser. 
+For instance, you may try to use esp.huhn.me. This require a Chrome-browser, because only this browser is supporting the Serial-API.
+Hints:
+1. ersase the card before you start flashing
+2. you have to add three files booloader.bin at address 0x1000, partition-table.bin at 0x8000 and the oxocard firmware file at 0x10000.
+3. It is perhaps still required to install the USB driver before you start with the flashing. if you cannot see the USB-connection, try to install the driver https://www.wch-ic.com/search?q=CH340&t=downloads before your start.
+Important note: plesae choose the right firmware file for your card.
+

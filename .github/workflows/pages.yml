@@ -28,8 +28,6 @@ jobs:
           python-version: 3.11
       - name: install poetry
         run: pip install poetry
-      - name: install esptool
-        run: pip install esptool
       - name: install builder
         run: poetry install
       - name: build

@@ -4,37 +4,48 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <title>Oxocard Firmware Web Installer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
 <body>
-    <div class="container my-5">
+    <main class="container">
+
+        <header>
+            <nav>
+                <ul>
+                    <li>
+                        <img class="only-on-dark" src="assets/img/oxocard-white.svg" width="150em" />
+                        <img class="only-on-light" src="assets/img/oxocard-black.svg" width="150em" />
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <hr>
         <h1>Oxocard Firmware Web Installer</h1>
-        <div class="col-lg-8 px-0">
 
-            <p>Select your product</p>
-            <ul class="radios">
-                {% for p in products -%}
-                <li>
-                    <input type="radio" name="type" value="{{ p.stem }}" />
-                    <label>{{ p.name }} {{ p.version }}</label>
-                </li>
-                {%- endfor %}
-            </ul>
-            <p class="button-row">
-                <esp-web-install-button class="invisible"></esp-web-install-button>
-            </p>
-        </div>
-    </div>
+        <p>Select your product</p>
+        <ul class=" radios">
+            {% for p in products -%}
+            <li>
+                <input type="radio" name="type" value="{{ p.stem }}" />
+                <label>{{ p.name }} {{ p.version }}</label>
+            </li>
+            {%- endfor %}
+        </ul>
+        <p class="button-row">
+            <esp-web-install-button class="invisible"></esp-web-install-button>
+        </p>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
-        crossorigin="anonymous"></script>
-    <script type="module" src="https://unpkg.com/esp-web-tools@9/dist/web/install-button.js?module"></script>
-    <script src="main.js"></script>
+    </main>
+    <hr>
+    <footer class="container">
+        OXON, Waldeggstrasse 47, CH-3097 Liebefeld, <a href="mailto:info@oxon.ch">info@oxon.ch</a>
+    </footer>
+    <script type="module" src="https://unpkg.com/esp-web-tools@10.1.1/dist/web/install-button.js?module"></script>
+    <script src="assets/js/main.js"></script>
 </body>
 
 </html>

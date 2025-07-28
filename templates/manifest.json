@@ -8,6 +8,9 @@
       "parts": [
         { "path": "firmware/common/bootloader.bin", "offset": 4096 },
         { "path": "firmware/common/partition-table.bin", "offset": 32768 },
+        {% if is_makey -%}
+        { "path": "firmware/nvs/nvs-makey.bin", "offset": 36864 },
+        {% endif -%}
         { "path": "firmware/{{ file_name }}", "offset": 65536 }
       ]
     }

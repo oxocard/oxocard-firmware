@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>Oxocard Firmware Web Installer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+    <main class="container">
+
+        <header>
+            <nav>
+                <ul>
+                    <li>
+                        <img class="only-on-dark" src="assets/img/oxocard-white.svg" width="150em" />
+                        <img class="only-on-light" src="assets/img/oxocard-black.svg" width="150em" />
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <hr>
+        <h1>Oxocard Firmware Web Installer</h1>
+
+        <p>Select your product</p>
+        <ul class=" radios">
+            {% for p in products -%}
+            <li>
+                <input type="radio" name="type" value="{{ p.stem }}" />
+                <label>{{ p.name }} {{ p.version }}</label>
+            </li>
+            {%- endfor %}
+        </ul>
+        <p class="button-row">
+            <esp-web-install-button class="invisible"></esp-web-install-button>
+        </p>
+
+    </main>
+    <hr>
+    <footer class="container">
+        OXON, Waldeggstrasse 47, CH-3097 Liebefeld, <a href="mailto:info@oxon.ch">info@oxon.ch</a>
+    </footer>
+    <script type="module" src="https://unpkg.com/esp-web-tools@10.1.1/dist/web/install-button.js?module"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

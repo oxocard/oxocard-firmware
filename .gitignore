@@ -1,0 +1,4 @@
+__pycache__
+webpage/firmware/*
+webpage/manifest_*
+webpage/index.html

@@ -1,0 +1,21 @@
+/*
+ * Custom CSS
+ */
+
+ul li {
+  list-style: none;
+}
+
+.only-on-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .only-on-dark {
+    display: block;
+  }
+
+  .only-on-light {
+    display: none;
+  }
+}

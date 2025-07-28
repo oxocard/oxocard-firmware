@@ -1,0 +1,51 @@
+def drawCartridge ():
+    noStroke()
+    fill(24,24,24)
+    drawRectangle(35, 90, 170, 40)
+    fill(0,0,0)
+    drawRectangle(114, 110, 12, 8)
+    fill(255,255,255)
+    drawRectangle(35, 130, 170, 45)
+    fill(0,0,0)
+    drawRectangle(117, 85, 6, 16)
+    fill(229,184,11)
+    for x1 in 8:
+        drawRectangle(50 + x1 * 8, 90, 4, 6)
+        drawRectangle(130 + x1 * 8, 90, 4, 6)
+    for x2 in 18:
+        if x2 != 4 && x2 != 10:
+            drawCircle(43 + x2 * 9 , 168, 2)
+            drawRectangle(41 + x2 * 9, 170, 5, 5)
+    stroke(24,24,24)
+    strokeWeight(1)
+    drawLine(38, 160, 38, 175)
+    drawLine(75, 160, 75, 175)
+    drawLine(83, 160, 83, 175)
+    drawLine(101, 160, 101, 175)
+    drawLine(129, 160, 129, 175)
+    drawLine(137, 160, 137, 175)
+    drawLine(182, 160, 182, 175)
+    drawLine(201, 160, 201, 175)
+    stroke(255,255,255)
+    strokeWeight(2)
+    drawLine(150, 110, 187, 110)
+    drawLine(150, 120, 187, 120)
+
+clear()
+textFont(FONT_ROBOTO_32)
+stroke(21,155,228)
+drawTextCentered(120,25,"EXPANSION")
+stroke(255,255,255)
+drawTextCentered(120,60,"CARTRIDGE")
+drawCartridge()
+textFont(FONT_ROBOTO_16)
+stroke(255,255,255)
+drawTextCentered(65,113,"011")
+textFont(FONT_ROBOTO_24)
+drawTextCentered(120,202,"Start your project")
+update()
+
+def onClick():
+    if getButton():
+        if returnToMenu():
+            return

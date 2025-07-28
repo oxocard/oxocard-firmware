@@ -1,0 +1,37 @@
+def drawCartridge ():
+    noStroke()
+    fill(24,24,24)
+    drawRectangle(40, 90, 160, 30)
+    fill(255,255,255)
+    drawRectangle(40, 120, 160, 10)
+    drawRectangle(53, 130, 136, 45)
+    fill(0,0,0)
+    drawRectangle(117, 85, 6, 16)
+    drawRectangle(70, 135, 100, 15)
+    fill(229,184,11)
+    drawCircle(60, 140, 2)
+    drawCircle(60, 147, 2)
+    drawCircle(181, 140, 2)
+    drawCircle(181, 147, 2)
+    for x1 in 8:
+        drawRectangle(50 + x1 * 8, 90, 4, 6)
+        drawRectangle(130 + x1 * 8, 90, 4, 6)
+    for x2 in 16:
+        drawCircle(60 + x2 * 8 , 168, 2)
+
+clear()
+textFont(FONT_ROBOTO_32)
+stroke(21,155,228)
+drawTextCentered(120,25,"CONNECTOR")
+stroke(255,255,255)
+drawTextCentered(120,60,"CARTRIDGE")
+drawCartridge()
+textFont(FONT_ROBOTO_24)
+stroke(255,255,255)
+drawTextCentered(120,200,"Start your project")
+update()
+
+def onClick():
+    if getButton():
+        if returnToMenu():
+            return

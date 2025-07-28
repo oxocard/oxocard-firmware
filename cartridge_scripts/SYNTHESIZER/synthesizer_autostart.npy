@@ -1,0 +1,230 @@
+def drawArrow(x,y,arrowNr:byte):
+    r=5
+    push()
+    noStroke()
+    fill(255,255,255)
+    translate(x,y)
+    if arrowNr == 0: # up
+        drawTriangle(-r,r,r,r,0,-r)
+    elif arrowNr == 1: # down
+        drawTriangle(-r,-r,r,-r,0,r)
+    elif arrowNr == 2: # left
+        drawTriangle(-r,0,r,-r,r,r)
+    elif arrowNr == 3: # right
+        drawTriangle(-r,-r,-r,r,r,0)
+    pop()
+
+def drawExit(x,y):
+    r=5
+    push()
+    stroke(255,255,255)
+    fill(255,255,255)
+    drawCircle(x,y,r/2)
+    noFill()
+    drawCircle(x,y,r)
+    pop()
+
+def drawHeader():
+    push()
+    textFont(FONT_ROBOTO_16)
+    stroke(255,255,255)
+    translate(30,6)
+    drawArrow(0,8,0)
+    translate(10,0)
+    drawArrow(0,8,1)
+    translate(10,0)
+    drawText(0,-2,"VOLUME")
+    translate(80,0)
+    drawArrow(0,8,2)
+    translate(15,0)
+    drawArrow(0,8,3)
+    translate(10,0)
+    drawText(0,-2,"SPEED")
+    pop()
+
+def drawFooter():
+    push()
+    textFont(FONT_ROBOTO_16)
+    stroke(255,255,255)
+    translate(100,210)
+    drawExit(0,8)
+    translate(10,0)
+    drawText(0,-2,"EXIT")
+    pop()
+
+def drumName(id:byte)->byte[20]:
+    if id == 35 return "Kick drum2"
+    if id == 36 return "Kick drum1"
+    if id == 36 return "Side Stick"
+    if id == 37 return "Snare Drum 1"
+    if id == 38 return "Hand Clap"
+    if id == 39 return "Snare Drum 2"
+    if id == 40 return "Low Floor Tom"
+    if id == 41 return "Closed Hi Hat"
+    if id == 42 return "High Floor Tom"
+    if id == 43 return "Pedal Hi-Hat"
+    if id == 44 return "Low Tom"
+    if id == 45 return "Open Hi-Hat"
+    if id == 46 return "Low-Mid Tom"
+    if id == 47 return "Hi Mid Tom"
+    if id == 48 return "Crash Cymbal 1"
+    if id == 49 return "High Tom"
+    if id == 50 return "Ride Cymbal 1"
+    if id == 51 return "Chinese Cymbal"
+    if id == 52 return "Ride Bell"
+    if id == 53 return "Tambourine"
+    if id == 54 return "Splash Cymbal"
+    if id == 55 return "Cowbell"
+    if id == 56 return "Crash Cymbal 2"
+    if id == 57 return "Vibraslap"
+    if id == 58 return "Ride Cymbal 2"
+    if id == 59 return "Hi Bongo"
+    if id == 60 return "Low Bongo"
+    if id == 61 return "Mute Hi Conga"
+    if id == 62 return "Open Hi Conga"
+    if id == 63 return "Low Conga"
+    if id == 64 return "High Timbale"
+    if id == 65 return "Low Timbale"
+    if id == 66 return "High Agogo"
+    if id == 67 return "Low Agogo"
+    if id == 68 return "Cabasa"
+    if id == 69 return "Maracas"
+    if id == 70 return "Short Whistle"
+    if id == 71 return "Long Whistle"
+    if id == 72 return "Short Guiro"
+    if id == 73 return "Long Guiro"
+    if id == 74 return "Claves"
+    if id == 75 return "Hi Wood Block"
+    if id == 76 return "Low Wood Block"
+    if id == 77 return "Mute Cuica"
+    if id == 78 return "Open Cuica"
+    if id == 79 return "Mute Triangle"
+    if id == 80 return "Open Triangle"
+    return ""
+
+_global_channel = 0
+
+# sets the master volume (0-127)
+def masterVolume(level:byte):
+    //F0H 7FH 7FH 04H 01H 00H ll F7H
+    command:byte[8]
+    command[0] = 0xf0
+    command[1] = 0x7f
+    command[2] = 0x7f
+    command[3] = 0x04
+    command[4] = 0x01
+    command[5] = 0x00
+    command[6] = (level & 0x7f)
+    command[7] = 0xf7
+    writeUART(8, command)
+
+def resetMidi():
+    command:byte[1]
+    command[0] = 0xff
+    writeUART(1,command)
+
+def initMidi():
+    initUART(C_PIN_01, C_PIN_02, 31250) # TX, RX, BAUDRATE
+    _midiInitialized = true
+
+def noteOn(note_:byte,velocity:byte):
+    command:byte[3]
+    command[0] = 0x90 | (_global_channel  & 0x0f)
+    command[1] = note_
+    command[2] = velocity
+    writeUART(3,command)
+
+def noteOff(pitch:byte):
+    command:byte[3]
+    command[0] = 0x80 | (_global_channel  & 0x0f)
+    command[1] = pitch
+    command[2] = 0
+    writeUART(3,command)
+
+def drum(dr:byte, velocity:byte):
+    if _global_channel != 9: _global_channel = 9
+    noteOn(dr,velocity)
+
+def allNotesOff():
+    command:byte[3]
+    command[0] = 0xb0 | (_global_channel  & 0x0f)
+    command[1] = 0x7b
+    command[2] = 0
+    writeUART(3,command)
+    # command:byte[3]
+    command[0] = 0xb0 | (_global_channel  & 0x0f)
+    command[1] = 0x78
+    command[2] = 0
+    writeUART(3,command)
+
+def drums():
+    _global_channel  = 9
+
+def channel(ch:byte):
+    _global_channel = ch
+
+def pan(value:int): #0 .. 64 .. 127
+    command:byte[3]
+    command[0] = (0xb0 | (_global_channel  & 0x0f))
+    command[1] = 0x0A
+    command[2] = value & 0x7f
+    writeUART(3,command)
+
+volume = 90
+pause = 200
+
+initMidi()
+resetMidi()
+masterVolume(volume)
+drums()
+
+def onTimer():
+    drumid = random(35,83)
+    push()
+    hsv = random(0,255)
+    strokeHSV(hsv,255,255)
+    backgroundHSV(hsv,255,80)
+    drawHeader()
+    drawFooter()
+    translate(120,120)
+    rotate(rad(20-random(0,40)))
+    rotateText(true)
+    fonts = [FONT_ROBOTO_24, FONT_ROBOTO_32]
+    textFont(fonts[random(0,2)])
+    drawTextCentered(0,0,drumName(drumid))
+    pan(random(0,128))
+    drum(drumid,127)
+    update()
+    pop()
+
+setInterval(pause)
+
+
+def onClick():
+    b = getButtons()
+
+    if b.up:
+        volume+=20
+        if volume > 127: volume = 127
+        masterVolume(volume)
+
+    if b.down:
+        volume-=20
+        if volume < 0: volume = 0
+        masterVolume(volume)
+
+    if b.left:
+        pause-=20
+        if pause < 20: pause = 20
+        setInterval(pause)
+    if b.right:
+        pause+=20
+        if pause > 500: pause = 500
+        setInterval(pause)
+
+    if b.middle:
+        if returnToMenu():
+            allNotesOff()
+            return
+
+    

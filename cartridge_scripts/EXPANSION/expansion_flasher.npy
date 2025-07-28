@@ -1,0 +1,85 @@
+import cartridge_header
+
+const CARTRIDGE_ID              = 0x00000050 # EXPANSION
+const CARTRIDGE_HW_VERSION      = 0x00000001
+const CARTRIDGE_FW_VERSION      = 0x00000002
+CARTRIDGE_NAME:byte[30]         = "EXPANSION"
+
+AUTOSTART_FILE:byte[40]         = "expansion_autostart.npy"
+IMPORT_FILE:byte[40]            = ""
+DEMO_01_FILE:byte[40]           = ""
+
+hasAutostart:bool = (strLen(AUTOSTART_FILE) > 0)
+hasImport:bool = (strLen(IMPORT_FILE) > 0)
+hasDemo:bool = (strLen(DEMO_01_FILE) > 0)
+
+ch:CartridgeHeader
+ch.init()
+
+def onDraw():
+    clear()
+    textFont(FONT_ROBOTO_32)
+    stroke(227,137,20)
+    drawText(10,10,CARTRIDGE_NAME)
+    stroke(255,255,255)
+    drawText(10,50,"FLASHER")
+    textFont(FONT_ROBOTO_24)
+    drawText(10,150,"click: burn header")
+    drawText(10,190,"down: exit")
+    update()
+    b = getButtons()
+    if b.left or b.right or b.up or b.middle:
+        # write eeprom
+        clear()
+        drawText(10,10,"writing EEPROM...")
+        update()
+        pauseCartridgeDetection()
+        ch.writeHeader(CARTRIDGE_ID, CARTRIDGE_HW_VERSION, CARTRIDGE_FW_VERSION, CARTRIDGE_NAME)
+        ch.writeAutostartScript(AUTOSTART_FILE)
+        ch.writeImportScript(IMPORT_FILE)
+        ch.writeDemo01Script(DEMO_01_FILE)
+        drawText(10,100,"done")
+        update()
+        delay(1000)
+        # read eeprom
+        clear()
+        id = ch.readId()
+        if id != CARTRIDGE_ID: stroke(255,0,0)
+        else: stroke(255,255,255)
+        drawText(10,10,"id = " + id)
+        hw = ch.readHwVersion()
+        if hw != CARTRIDGE_HW_VERSION: stroke(255,0,0)
+        else: stroke(255,255,255)
+        drawText(10,40,"hw = " + hw)
+        fw = ch.readFwVersion()
+        if fw != CARTRIDGE_FW_VERSION: stroke(255,0,0)
+        else: stroke(255,255,255)
+        drawText(10,70,"fw = " + fw)
+        name:byte[30]
+        name = ch.readName()
+        if strLen(name) != strLen(CARTRIDGE_NAME): stroke(255,0,0)
+        else: stroke(255,255,255)
+        drawText(10,100,"name = " + name)
+        isAutostart:bool = ch.isAutostart()
+        if hasAutostart && isAutostart: stroke(0,255,0)
+        elif hasAutostart && not isAutostart: stroke(255,0,0)
+        else: stroke(255,255,255)
+        drawText(10,130,"autostart = " + isAutostart)
+        isImport:bool = ch.hasImportScript()
+        if hasImport && isImport: stroke(0,255,0)
+        elif hasImport && not isImport: stroke(255,0,0)
+        else: stroke(255,255,255)
+        drawText(10,160,"importScript = " + isImport)
+        isDemo:bool = ch.hasDemo01Script()
+        if hasDemo && isDemo: stroke(0,255,0)
+        elif hasDemo && not isDemo: stroke(255,0,0)
+        else: stroke(255,255,255)
+        drawText(10,190,"demo01Script = " + isDemo)
+        update()
+        while(not getButton()): delay(10)
+        while(getButton()): delay(10)
+        resumeCartridgeDetection()
+    if b.down:
+        if returnToMenu():
+            return
+    delay(10)

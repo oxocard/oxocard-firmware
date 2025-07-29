@@ -2,3 +2,4 @@ __pycache__
 webpage/firmware/*
 webpage/manifest_*
 webpage/index.html
+oxocard_binaries/.DS_Store

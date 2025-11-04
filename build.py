@@ -49,6 +49,12 @@ science = Card(
     directory="science",
     blob="oxocard_mini_science_v*.bin",
 )
+science_plus = Card(
+    name="Oxocard Mini Science + (PLUS)",
+    manifest="scienceplus",
+    directory="scienceplus",
+    blob="oxocard_mini_science_plus_v*.bin",
+)
 connect = Card(
     name="Oxocard Mini Connect",
     manifest="connect",
@@ -64,7 +70,7 @@ connect_makey = Card(
 
 firmware_path = Path("oxocard_binaries")
 
-cards = [artwork, galaxy, science, connect, connect_makey]
+cards = [artwork, galaxy, science, science_plus, connect, connect_makey]
 
 
 @app.command()
